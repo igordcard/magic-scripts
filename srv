@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Igor Duarte Cardoso
+# 20131024
+
+usage() {
+    echo "Usage: "
+    echo "  srv list"
+    echo "  srv <services prefix string> <operation>" 
+    echo "Example: "
+    echo "  srv neutron restart"
+    exit
+}
+
+if [ $# -lt 1 ]; then
+  usage
+fi
+
+if [ "$1" == "list" ]; then
+  cd /etc/init.d/
+  for file in *; do
+    if [ -h $file ]
+      then echo $file
+    fi
+  done
+else
+  if [ $# -lt 2 ]; then
+    usage
+  fi
+  for file in /etc/init.d/$1*; do
+    sudo service ${file##*/} $2
+  done
+fi
