@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Igor Duarte Cardoso
-# 1.1 - 20131114
+# 1.1.1 - trunk
 
 usage() {
     echo "Usage: "
@@ -35,8 +35,10 @@ case "$1" in
     usage
   fi
   for file in /etc/init.d/$2*; do
-    sudo rm "/etc/init/${file##*/}.override" > /dev/null 2>&1 # upstart
-    #sudo update-rc.d ${file##*/} defaults > /dev/null 2>&1 # rc.d
+    servname=${file##*/}
+    sudo rm "/etc/init/${servname}.override" > /dev/null 2>&1 # upstart
+    echo "Enabling $servname"
+    #sudo update-rc.d ${servname} defaults > /dev/null 2>&1 # rc.d
   done
   ;;
 
@@ -45,7 +47,9 @@ case "$1" in
     usage
   fi
   for file in /etc/init.d/$2*; do
-    echo 'manual' | sudo tee "/etc/init/${file##*/}.override" > /dev/null 2>&1 # upstart
+    servname=${file##*/}
+    echo 'manual' | sudo tee "/etc/init/${servname}.override" > /dev/null 2>&1 # upstart
+    echo "Disabling $servname"
     #sudo update-rc.d -f ${file##*/} remove > /dev/null 2>&1 # rc.d
   done
   ;;
