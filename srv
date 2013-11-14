@@ -36,9 +36,8 @@ case "$1" in
   fi
   for file in /etc/init.d/$2*; do
     servname=${file##*/}
-    sudo rm "/etc/init/${servname}.override" > /dev/null 2>&1 # upstart
+    sudo rm "/etc/init/${servname}.override" # upstart
     echo "Enabling $servname"
-    #sudo update-rc.d ${servname} defaults > /dev/null 2>&1 # rc.d
   done
   ;;
 
@@ -48,9 +47,8 @@ case "$1" in
   fi
   for file in /etc/init.d/$2*; do
     servname=${file##*/}
-    echo 'manual' | sudo tee "/etc/init/${servname}.override" > /dev/null 2>&1 # upstart
+    echo 'manual' | sudo tee "/etc/init/${servname}.override" # upstart
     echo "Disabling $servname"
-    #sudo update-rc.d -f ${file##*/} remove > /dev/null 2>&1 # rc.d
   done
   ;;
 
