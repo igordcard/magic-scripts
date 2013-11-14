@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Igor Duarte Cardoso
+# 1.0 - 20131114
+
+usage() {
+    echo "Usage: "
+    echo "  connectedto <segment of a network address>"
+    echo "Example: "
+    echo "  connectedto 192.168.1"
+    exit
+}
+
+if [ $# -lt 1 ]; then
+  usage
+fi
+
+nets=$(hostname -I)
+
+if [[ "$nets" == *$1* ]]
+then
+  echo "Yes";
+else
+  echo "No";
+fi
