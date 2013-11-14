@@ -1,14 +1,17 @@
 #!/bin/bash
 
 # Igor Duarte Cardoso
-# 20131024
+# 1.1 - 20131114
 
 usage() {
     echo "Usage: "
     echo "  srv list"
-    echo "  srv <services prefix string> <operation>" 
-    echo "Example: "
+    echo "  srv <services' prefix string> <operation>" 
+    echo "  srv disable <services' prefix string>" 
+    echo "  srv enable <services' prefix string>" 
+    echo "Examples: "
     echo "  srv neutron restart"
+    echo "  srv disable neutron"
     exit
 }
 
@@ -16,18 +19,44 @@ if [ $# -lt 1 ]; then
   usage
 fi
 
-if [ "$1" == "list" ]; then
+case "$1" in
+
+"list")
   cd /etc/init.d/
   for file in *; do
     if [ -h $file ]
       then echo $file
     fi
   done
-else
+  ;;
+
+"enable")
+  if [ $# -lt 2 ]; then
+    usage
+  fi
+  for file in /etc/init.d/$2*; do
+    sudo rm "/etc/init/${file##*/}.override" > /dev/null 2>&1 # upstart
+    #sudo update-rc.d ${file##*/} defaults > /dev/null 2>&1 # rc.d
+  done
+  ;;
+
+"disable")
+  if [ $# -lt 2 ]; then
+    usage
+  fi
+  for file in /etc/init.d/$2*; do
+    echo 'manual' | sudo tee "/etc/init/${file##*/}.override" > /dev/null 2>&1 # upstart
+    #sudo update-rc.d -f ${file##*/} remove > /dev/null 2>&1 # rc.d
+  done
+  ;;
+
+*)
   if [ $# -lt 2 ]; then
     usage
   fi
   for file in /etc/init.d/$1*; do
     sudo service ${file##*/} $2
   done
-fi
+  ;;
+
+esac
