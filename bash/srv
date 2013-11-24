@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Igor Duarte Cardoso
-# 1.1.1 - 20131114
+# 1.1.2 - 20131124
 
 usage() {
     echo "Usage: "
@@ -24,7 +24,7 @@ case "$1" in
 "list")
   cd /etc/init.d/
   for file in *; do
-    if [ -h $file ]
+    if [ -x $file ]
       then echo $file
     fi
   done
