@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Igor Duarte Cardoso
+# 1.0.0 - 20140320
+
+usage() {
+    echo "Usage: "
+    echo "  wundermail <user email address> <file with task list>"
+    echo "Example: "
+    echo "  wundermail joe.maximus@gmail.com my-task-list.txt"
+    echo "Requirements: "
+    echo "  mailx"
+    exit
+}
+
+function wundermail() {
+    from=$1
+    user=$1
+    subject=$2
+    body=$3
+    passw=$4
+
+    to=me@wunderlist.com
+    smtp_addr=smtp.gmail.com
+    smtp_port=587
+
+    opts="-S smtp-use-starttls \
+    -S ssl-verify=ignore \
+    -S smtp-auth=login \
+    -S smtp=smtp://$smtp_addr:$smtp_port \
+    -S from=$from \
+    -S smtp-auth-user=$user \
+    -S smtp-auth-password=$passw \
+    -S ssl-verify=ignore"
+
+    echo "$body" | mailx -s "$subject" -v $opts $to
+}
+
+if [ $# -lt 2 ]; then
+  usage
+fi
+
+stty -echo </dev/tty;
+read -p "SMTP Password: " passw < /dev/tty
+echo
+stty </dev/tty echo
+
+while read p; do
+    echo $p
+    wundermail "$1" "$p" "$p" "$passw"
+done < "$2"
+
