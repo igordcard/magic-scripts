@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Igor Duarte Cardoso
-# 1.0.3 - 20140321
+# 1.3.0 - 20140321
 
 usage() {
     echo "Usage: "
@@ -33,7 +33,7 @@ function wundermail() {
     -S smtp-auth-password=$passw \
     -S ssl-verify=ignore"
 
-    echo "" | mailx -s "$subject" -v $opts $to 1> /dev/null 2> /dev/null
+    echo $body | mailx -s "$subject" -v $opts $to 1> /dev/null 2> /dev/null
 }
 
 if [ $# -lt 2 ]; then
@@ -46,10 +46,18 @@ echo
 stty </dev/tty echo
 
 i=0
-while read p || [ -n "$p" ]; do
+while read task || [ -n "$task" ]; do
     ((i++))
-    echo "Sending task "$i": "$p"..."
-    wundermail "$1" "$p" "$p" "$passw"
+    echo "Sending task "$i": "$task"..."
+    if [ ${#task} -ge 256 ]
+    then
+        title="${task:0:256}"
+    else
+        title=$task
+        task=""
+    fi
+
+    wundermail "$1" "$title" "$task" "$passw"
     if [ $? -eq 0 ]
     then
         echo "Task "$i" sent successfully!"
