@@ -49,9 +49,9 @@ i=0
 while read task || [ -n "$task" ]; do
     ((i++))
     echo "Sending task "$i": "$task"..."
-    if [ ${#task} -ge 256 ]
+    if [ ${#task} -ge 255 ]
     then
-        title="${task:0:256}"
+        title="${task:0:255}"
     else
         title=$task
         task=""
@@ -64,7 +64,7 @@ while read task || [ -n "$task" ]; do
     else
         echo "Failed to send task "$i", is the email configuration/password correct?"
     fi
-    sleep 3
+    sleep 10
 done < "$2"
 
 echo "Finished!"
