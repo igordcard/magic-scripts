@@ -1,0 +1,34 @@
+# Bash completion for dropbox.py
+# 
+# Ilan Pegoraro <iemoreirap@gmail.com>
+
+_dropbox()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    COMMANDS="status help puburl stop running start filestatus ls autostart exclude"
+    OPTS="-i --install -l --list -a --all"
+
+    if [ $COMP_CWORD -eq 1 ]; then
+       completions="$COMMANDS"
+    elif [ $COMP_CWORD -eq 2 ]; then
+       first="${COMP_WORDS[1]}"
+       case "$first" in
+           autostart) completions="y n";;
+           exclude) completions="list add remove";;
+           puburl)
+               local pubnames=$(while read i; do echo "$i"; done < <(find  $HOME/Dropbox/Public -type f) )
+               completions=$pubnames
+               #COMPREPLY=( $(compgen -W "${pubfiles}" -- ${cur}) )
+           ;;
+           *) return 1;;
+       esac
+    else
+       return 1
+    fi
+    COMPREPLY=( $( compgen -W "$completions" -- $cur ))
+    return 0
+}
+complete -o default -F _dropbox dropbox
