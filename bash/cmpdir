@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# Ilan Pegoraro <iemoreirap@gmail.com>
+# v0.4 - 2014-10-18
+
+
+usage()
+{
+  echo "cmpdir v0.4"
+  echo "Compares two directories file using a temporary file with a file's hash"
+  echo "Usage: cmpdir <directory1> <directory2> [options]"
+  echo "  -a <alg>        Changes the hasg algorithm, default md5sum"
+  echo "  -r              Removes automatically the temporary file with the hashes in /tmp/, disabled default"
+  echo "  -t              Trucate the file hash, by default if the file is not empty new hashes are appended."
+  echo "  -f <file>       Changes the file hash path by the given one, default /tmp/hashFile-\$RANDOM."
+  echo "  -c              Show number of files in each directory, disabled by default."
+  echo ""
+
+}
+
+rmHashList=0
+hashFileList=/tmp/hashList-`echo $[ 1000 + $[ RANDOM % 9999 ]]`
+truncateFile=0
+hashAlg=md5sum
+countFiles=0
+
+# we use the first two parameters as the directories name
+OPTIND=3
+while getopts "cf:rta:" opt; do
+  case $opt in
+    a)
+      hashAlg=$OPTARG
+      ;;
+    r)
+      rmHashList=1
+      ;;
+    t)
+      truncateFile=1
+      ;;
+    f)
+      hashFileList=$OPTARG
+      ;;
+    c)
+      countFiles=1
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+    ;;
+  esac
+done
+
+if [ ! -d "$1" ] || [ ! -d "$2" ];
+then
+    usage
+    exit
+fi
+
+# turning the 
+src1=$1 
+src2=$2
+
+if [ "$truncateFile" -eq "1" ];
+then
+    truncate --size=0 $hashFileList
+fi
+
+#the task
+find "$src2" -type f -exec $hashAlg '{}' >> $hashFileList \;
+
+while read line; 
+do 
+    fhash=`$hashAlg "$line" | cut -d' ' -f1`
+    grep "$fhash" "$hashFileList" > /dev/null 2>/dev/null
+    if [ ! "$?" -eq "0" ]
+    then
+        echo "$line" does not exists in "$2"
+    fi
+done < <(find "$src1" -type f)
+
+
+if [ "$countFiles" -eq "1" ];
+then
+  echo "$src1" ":" `find $src1 -type f | wc -l` " files";
+  echo "$src2" ":" `find $src2 -type f | wc -l` " files";
+fi
+
+# clenup
+if [ "$rmHashList" -eq "1" ];
+then
+    rm $hashFileList
+fi
+
+
