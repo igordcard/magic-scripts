@@ -1,0 +1,30 @@
+# bash completion for vboxheadless
+
+_vboxheadless()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    COMMANDS="-s -startvm --startvm -v -vrde --vrde -e -vrdeproperty --vrdeproperty --settingspw --settingspwfile -c -capture --capture -w --width -h --height -r --bitrate -f --filename"
+
+
+    if [ $COMP_CWORD -eq 1 ]; then
+       completions="$COMMANDS"
+    elif [ $COMP_CWORD -eq 2 ]; then
+       first="${COMP_WORDS[1]}"
+       case "$first" in
+           "-v"|"-vrde"|"--vrde") completions="on off config" ;;
+           "-s")
+               local vms=$(while read i; do echo "$i"; done < <(VBoxManage list vms | cut -d' ' -f1) )
+               completions=$vms
+           ;;
+           *) return 1;;
+       esac
+    else
+       return 1
+    fi
+    COMPREPLY=( $( compgen -W "$completions" -- $cur ))
+    return 0
+}
+complete -o default -F _vboxheadless vboxheadless
