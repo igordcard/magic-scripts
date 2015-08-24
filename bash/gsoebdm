@@ -1,76 +1,88 @@
 #!/bin/bash
 
-# GSOEDBM v1.0 - 20150822
-# generic storage obfuscator, encryptor and database manager
+# GSOEDBM v1.1 - 20150824
+# Generic Storage Obfuscator, Encryptor and Database Manager
 
-# filenames to keep in mind
-me=`basename "$0"`
-db="db"
-dba=$db".aes"
-dbo=$dba".old"
+# $1: full path of the backup directory (optional)
+function gsoebdm() {
+	# filenames to keep in mind
+#	me=`basename "$1"`
+	me="gsoebdm"
+	db="db"
+	dba=$db".aes"
+	dbo=$dba".old"
 
-# which must also be skipped when processing, and any .aes file too
-exceptions=("$me" "$db" "$dba" "$dbo")
+	# which must also be skipped when processing, and any .aes file too
+	exceptions=("$me" "$db" "$dba" "$dbo")
 
-# optional: external backup directory (="" disables)
-bakdir="$1"
+	# optional: external backup directory (="" disables)
+	bakdir="$1"
 
-# get password to use for encryption
-echo -n "Password: "
-read -s password
-echo
+	# get password to use for encryption
+	echo -n "Password: "
+	read -s password
+	echo
 
-# decrypt database
-aescrypt -d -p $password "$dba"
+	# decrypt database
+	aescrypt -d -p $password "$dba"
 
-if [ $? != 0 ]; then
-	exit 1
-fi
+	if [ $? != 0 ]; then
+		return 1
+	fi
 
-for f in *
-do
-	# skip exceptions
-	[[ ${f: -4} == ".aes" ]] && continue
-	skip=0
-	for item in ${exceptions[@]}
+	for f in *
 	do
-		[[ $f == "$item" ]] && skip=1
+		# skip exceptions:
+		skip=0
+		# .aes files
+		[[ ${f: -4} == ".aes" ]] && continue
+		# specific exceptions
+		for item in ${exceptions[@]}
+		do
+			[[ $f == "$item" ]] && skip=1
+		done
+		[[ $skip == 1 ]] && continue
+
+		echo -n "$f... "
+
+		# directories need to be archived before
+		if [[ -d $f ]]; then
+			tar -cf "$f.tar" "$f"
+			f="$f.tar"
+		fi
+
+		# get timestamp and name, and insert into the database
+		t=`date +%s`
+		echo "$t: $f" >> "$db"
+
+		# rename original file and then encrypt it
+		mv "$f" "$t"
+		aescrypt -e -p $password "$t"
+
+		# remove original file
+		rm "$t"
+
+		# sleep 1 ensures that timestamps are unique
+		sleep 1
+
+		echo "OK."
 	done
-	[[ $skip == 1 ]] && continue
 
-	echo -n "$f... "
+	# backup previous state of database
+	rm "$dbo" 2>/dev/null
+	mv "$dba" "$dbo"
 
-	# get timestamp and name, and insert into the database
-	t=`date +%s`
-	echo "$t: $f" >> "$db"
+	# encrypt newest database
+	aescrypt -e -p $password "$db"
 
-	# rename original file and then encrypt it
-	mv "$f" "$t"
-	aescrypt -e -p $password "$t"
+	# remove plain text database
+	rm "$db"
 
-	# remove original file
-	rm "$t"
+	# backup to external directory if enabled
+	if [[ -n $bakdir ]]; then
+		cp "$dba" "$bakdir"
+		cp "$dbo" "$bakdir"
+	fi
 
-	# sleep insures that timestamps are unique
-	sleep 1
-
-	echo "OK."
-done
-
-# backup previous state of database
-rm "$dbo" 2>/dev/null
-mv "$dba" "$dbo"
-
-# encrypt newest database
-aescrypt -e -p $password "$db"
-
-# remove plain text database
-rm "$db"
-
-# backup to external directory if enabled
-if [ -n $bakdir ]; then
-	cp "$dba" "$bakdir"
-	cp "$dbo" "$bakdir"
-fi
-
-echo "All done!"
+	echo "All done!"
+}
