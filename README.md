@@ -3,6 +3,14 @@ Magic Scripts
 
 Some magic ~~tricks~~ scripts to help us overcome the day.
 
+gbt.sh
+---
+gerrit backup tool.
+
+install-xrdp-1-8-1.sh
+---
+Modified version of Griffon's xrdp 0.9 script for Ubuntu 16.04, originally available at http://c-nergy.be/blog/?p=10513.
+
 connectedto
 ---
 This bash script checks if the host computer is connected to a network whose address includes a part that is specified by an argument.
