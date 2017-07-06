@@ -7,6 +7,10 @@ irssi/shell_notify.pl
 ---
 Notify your shell when messages are received in IRC (irssi), works fine over SSH using Cygwin on Windows, as an example.
 
+irssi/email_msgs.pl
+---
+Email you when IRC messages are received (or even sent) in irssi, including mentions. Very configurable with multiple options.
+
 gbt.sh
 ---
 gerrit backup tool.
