@@ -3,6 +3,10 @@ Magic Scripts
 
 Some magic ~~tricks~~ scripts to help us overcome the day.
 
+irssi/shell_notify.pl
+---
+Notify your shell when messages are received in IRC (irssi), works fine over SSH using Cygwin on Windows, as an example.
+
 gbt.sh
 ---
 gerrit backup tool.
