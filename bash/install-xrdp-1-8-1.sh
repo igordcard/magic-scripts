@@ -2,10 +2,10 @@
 # Script_Name : install-xrdp-1.8-1.sh
 # Description : Perform an automated custom installation of xrdp
 # on ubuntu 16.04.2
-# Date : June 30th 2017
+# Date : July 28th 2017
 # written by : Griffon (modified by igordcard)
 # Web Site :http://www.c-nergy.be - http://www.c-nergy.be/blog
-# Version : 1.8.1
+# Version : 1.8.1.1
 #
 # Disclaimer : Script provided AS IS. Use it at your own risk....
 #
@@ -17,7 +17,13 @@
  
 echo "Installing prereqs for compiling xrdp..."
 echo "----------------------------------------"
+sudo apt-get update -y
+sudo apt-get upgrade -y
 sudo apt-get -y install libx11-dev libxfixes-dev libssl-dev libpam0g-dev libtool libjpeg-dev flex bison gettext autoconf libxml-parser-perl libfuse-dev xsltproc libxrandr-dev python-libxml2 nasm xserver-xorg-dev fuse git pkg-config
+
+# fontutil.h fix
+sudo apt purge libxfont-dev -y
+sudo apt install libxfont1-dev -y
 
 # extra, non-related to compilation, make sure xserver-xorg is installed:
 sudo apt-get -y install xserver-xorg
