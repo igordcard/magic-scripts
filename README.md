@@ -3,6 +3,10 @@ Magic Scripts
 
 Some magic ~~tricks~~ scripts to help us overcome the day.
 
+install_from_source-proxy.sh
+---
+OSM deployment script, corrected to work behind a proxy.
+
 irssi/shell_notify.pl
 ---
 Notify your shell when messages are received in IRC (irssi), works fine over SSH using Cygwin on Windows, as an example.
