@@ -23,9 +23,7 @@ backup() {
 
 
 restore() {
-  tar -xf $filelist
-  #cp -R --no-preserve=mode,ownership _root/* $realroot
-  #rsync -rltDv  _root/ $realroot/
+  tar -xf $filelist --strip-components=1 -C $realroot
   rm -rf _root
 }
 
