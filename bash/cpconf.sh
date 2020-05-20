@@ -9,11 +9,15 @@ backup() {
 
   while IFS= read -r filename
   do
+    [[ "$filename" =~ ^[[:space:]]*# ]] && continue
     dir=`dirname "$filename"`
     mkdir -p "_root$dir"
     cp -pR ${filename} "$_"
     echo "$filename"
   done < "$filelist"
+  archive=$filelist-$(date +%s).tar.gz
+  echo "Archiving to $archive..."
+  tar -czf $archive _root
 }
 
 
