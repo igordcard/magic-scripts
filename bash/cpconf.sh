@@ -2,6 +2,7 @@
 
 operation=$1
 filelist=$2
+realroot=$3
 
 
 backup() {
@@ -22,7 +23,10 @@ backup() {
 
 
 restore() {
-  pwd
+  tar -xf $filelist
+  #cp -R --no-preserve=mode,ownership _root/* $realroot
+  #rsync -rltDv  _root/ $realroot/
+  rm -rf _root
 }
 
 case $operation in
@@ -36,6 +40,6 @@ case $operation in
     ;;
   * )
 	  echo "Usage: cpconf backup <file with filelist>"
-	  echo "       cpconf restore <backup root dir> <true root dir>"
+	  echo "       cpconf restore <backup archive> <destination root dir>"
     ;;
 esac
